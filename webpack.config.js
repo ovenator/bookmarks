@@ -167,6 +167,13 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [{from: 'source/assets', to: 'assets'}],
     }),
+    // copy app
+    new CopyWebpackPlugin({
+      patterns: [
+        {from: 'app/build/static', to: 'static'},
+        {from: 'app/build/index.html', to: 'index.html'},
+      ],
+    }),
     // plugin to enable browser reloading in development mode
     extensionReloaderPlugin,
   ],
