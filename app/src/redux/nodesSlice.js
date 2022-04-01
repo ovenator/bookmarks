@@ -59,7 +59,7 @@ export const nodesSlice = createSlice({
          * @param {String} action.payload.rootItemId item which contains the tab folders
          */
         setData: (state, action) => {
-            debug('settingData');
+            debug('settingData', action);
             const {itemsById, rootItemId} = action.payload;
             state.itemsById = itemsById;
             state.rootItemId = rootItemId;

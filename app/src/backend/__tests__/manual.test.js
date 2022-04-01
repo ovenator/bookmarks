@@ -1,4 +1,4 @@
-import {setStorage, getLayout, move} from '../layout';
+import {setStorage, calculateLayout, move} from '../layout';
 
 const data = {}
 const storage = {
@@ -13,7 +13,7 @@ const storage = {
 setStorage(storage);
 
 test('should modify layout', async () => {
-    let {layout} = getLayout({tabs: [
+    let {layout} = calculateLayout({tabs: [
             {id: '0', children: [{id: '0.0'},{id: '0.1'},{id: '0.2'},{id: '0.3'},]},
             {id: '1', children: [{id: '1.0'},{id: '1.1'},{id: '1.2'},{id: '1.3'},]},
             {id: '2', children: [{id: '2.0'},{id: '2.1'},{id: '2.2'},{id: '2.3'},]},
@@ -55,7 +55,7 @@ test('should modify layout', async () => {
     });
 
 
-    let {layout: layout5} = getLayout({tabs: [
+    let {layout: layout5} = calculateLayout({tabs: [
             {id: '0', children: [{id: '0.0'},{id: '0.1'},{id: '0.2'},{id: '0.3'},]},
             {id: '1', children: [{id: '1.0'},{id: '1.1'},{id: '1.2'},{id: '1.3'},]},
             {id: '2', children: [{id: '2.0'},{id: '2.1'},{id: '2.2'},{id: '2.3'},]},
@@ -70,7 +70,7 @@ test('should modify layout', async () => {
     });
 
 
-    let {layout: layout6} = getLayout({tabs: [
+    let {layout: layout6} = calculateLayout({tabs: [
             {id: '0', children: [{id: '0.0'},{id: '0.1'},{id: '0.2'},{id: '0.3'},]},
             {id: '1', children: [{id: '1.0'},{id: '1.2'},{id: '1.3'},]},
             {id: '2', children: [{id: '2.0'},{id: '2.1'},{id: '2.2'},{id: '2.3'},]},

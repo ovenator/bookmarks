@@ -4,7 +4,7 @@ import { ReactSortable } from "react-sortablejs";
 import {useDispatch, useSelector} from "react-redux";
 import {setCurrentTabItem} from "./redux/nodesSlice";
 
-import {getBackend} from "./backend";
+import * as bookmarksBackend from "./backend/bookmarks";
 import * as layoutBackend from './backend/layout';
 
 
@@ -57,7 +57,7 @@ const App = () => {
 
             return  (
                 <div data-item-id={item.id} key={`item-${item.id}`} className="flex gap-1">
-                    <img className="w-5 h-5" src={`chrome://favicon/${item.url}`} alt=""/><a href={item.url}>{item.title} ({item.id})</a>
+                    <img className="w-5 h-5" src={`http://www.google.com/s2/favicons?domain=${(new URL(item.url)).hostname}`} alt=""/><a href={item.url}>{item.title} ({item.id})</a>
                 </div>
             )
 
@@ -75,8 +75,8 @@ const App = () => {
                 animation={200}
                 delayOnTouchStart={true}
                 delay={2}
-                onAdd={(customEvent) => getBackend().move({parent_id: item.id, item_id: customEvent.item.dataset.itemId, index: customEvent.newIndex})} //move
-                onUpdate={(customEvent) => getBackend().move({parent_id: item.id, item_id: customEvent.item.dataset.itemId, index: customEvent.newIndex})} //move
+                onAdd={(customEvent) => bookmarksBackend.move({parent_id: item.id, item_id: customEvent.item.dataset.itemId, index: customEvent.newIndex})} //move
+                onUpdate={(customEvent) => bookmarksBackend.move({parent_id: item.id, item_id: customEvent.item.dataset.itemId, index: customEvent.newIndex})} //move
                 list={item.children.map(id => ({...itemsById[id]}))}
                 setList={(items) => debug('setList', items)} //ignored, state is changed by onAdd, onUpdate
             >

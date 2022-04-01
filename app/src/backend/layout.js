@@ -39,7 +39,7 @@ function getItem(key) {
  * @param {{tabs: Tab[]}} params
  * @returns {{layout: Layout}}
  */
-export function getLayout({tabs}) {
+export function calculateLayout({tabs}) {
 
     //recalculate card -> column placement
     let newLayout = {};
@@ -88,11 +88,6 @@ export function getLayout({tabs}) {
     layoutObserver.emit('change', {layout: newLayout});
 
     return {layout: newLayout};
-}
-
-
-export function init(params) {
-    getLayout(params)
 }
 
 

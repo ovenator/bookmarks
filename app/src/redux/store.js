@@ -1,12 +1,9 @@
 import {configureStore, createStore, combineReducers} from '@reduxjs/toolkit'
 import nodes, {setData, setLayout} from './nodesSlice'
-import * as backend from '../backend';
-import * as mockBackend from '../backend/mockBackend';
+import * as bookmarks from '../backend/bookmarks';
 import * as layout from '../backend/layout';
 
 const debug = require('debug')('app:store');
-
-backend.setBackend(mockBackend);
 
 const reducer = {
     nodes,
@@ -21,21 +18,26 @@ layout.onChange((data) => {
     store.dispatch(setLayout(data));
 });
 
-backend.getBackend().onChange((data) => {
-
-    store.dispatch(setData(data));
-
+bookmarks.onChange((data) => {
     const {itemsById, rootItemId} = data;
     const tabIds = itemsById[rootItemId].children;
-    layout.getLayout({tabs: tabIds.map(tab_id => {
+    debug('setting layout', itemsById, rootItemId, tabIds);
+    layout.calculateLayout({
+        tabs: tabIds.map(tab_id => {
             return {
                 id: tab_id,
                 children: itemsById[tab_id].children.filter(item_id => itemsById[item_id].children).map(item_id => ({id: item_id}))
             }
-        })})
+        })
+    });
+
+    debug('setting data', data);
+
+    store.dispatch(setData(data));
+
 })
 
-backend.getBackend().load();
+bookmarks.load();
 
 
 

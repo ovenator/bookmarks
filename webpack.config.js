@@ -172,6 +172,7 @@ module.exports = {
       patterns: [
         {from: 'app/build/static', to: 'static'},
         {from: 'app/build/index.html', to: 'index.html'},
+        {from: 'source/dev.html', to: 'dev.html'},
       ],
     }),
     // plugin to enable browser reloading in development mode
