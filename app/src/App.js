@@ -3,6 +3,8 @@ import './App.css';
 import { ReactSortable } from "react-sortablejs";
 import {useDispatch, useSelector} from "react-redux";
 import {setCurrentTabItem} from "./redux/nodesSlice";
+import {setCurrentTabId} from "./redux/treeSlice";
+import treeStore from './redux/treeStore';
 
 import * as bookmarksBackend from "./backend/bookmarks";
 import * as layoutBackend from './backend/layout';
@@ -91,7 +93,7 @@ const App = () => {
         <div>
             <div className="container mx-auto flex gap-3 p-3">
                 {tabIds.map(id => (
-                    <div key={`item-${id}`} className={id === currentTabItemId ? 'border-blue-400 border-b-2' : ''} onClick={() => dispatch(setCurrentTabItem({id}))}>{itemsById[id].title} ({id})</div>
+                    <div key={`item-${id}`} className={id === currentTabItemId ? 'border-blue-400 border-b-2' : ''} onClick={() => treeStore.dispatch(setCurrentTabId({id}))}>{itemsById[id].title} ({id})</div>
                 ))}
             </div>
             <div className="flex border container mx-auto">

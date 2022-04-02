@@ -1,7 +1,8 @@
 import {configureStore, createStore, combineReducers} from '@reduxjs/toolkit'
-import nodes, {setData, setLayout} from './nodesSlice'
+import nodes, {setData, setLayout, setTree} from './nodesSlice'
 import * as bookmarks from '../backend/bookmarks';
 import * as layout from '../backend/layout';
+import treeStore from './treeStore';
 
 const debug = require('debug')('app:store');
 
@@ -11,11 +12,6 @@ const reducer = {
 
 const store = configureStore({
     reducer
-});
-
-layout.onChange((data) => {
-    debug('layout.onChange', data);
-    store.dispatch(setLayout(data));
 });
 
 bookmarks.onChange((data) => {
@@ -34,16 +30,18 @@ bookmarks.onChange((data) => {
     debug('setting data', data);
 
     store.dispatch(setData(data));
-
+    store.dispatch(setTree(treeStore.getState().tree));
 })
 
 bookmarks.load();
 
+layout.onChange((data) => {
+    debug('layout.onChange', data);
+    store.dispatch(setLayout(data));
+});
 
-
-
-store.subscribe(() => {
-    // persistLayout(store.getState());
+treeStore.subscribe(() => {
+    store.dispatch(setTree(treeStore.getState().tree));
 })
 
 export default store;

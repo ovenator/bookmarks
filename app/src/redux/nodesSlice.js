@@ -83,10 +83,20 @@ export const nodesSlice = createSlice({
          */
         setLayout: (state, action) => {
             state.layout = action.payload.layout
+        },
+        /**
+         * @param state
+         * @param {TreeSlice} action.payload
+         */
+        setTree: (state, action) => {
+
+            state.tree = action.payload;
+            state.currentTabItemId = action.payload.currentTabId ?? state.currentTabItemId;
+
         }
     },
 })
 
-export const { setChildren, setColumnChildren, setCurrentTabItem, setData, setLayout } = nodesSlice.actions
+export const { setChildren, setColumnChildren, setCurrentTabItem, setData, setLayout, setTree } = nodesSlice.actions
 
 export default nodesSlice.reducer
