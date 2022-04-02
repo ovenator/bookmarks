@@ -11,7 +11,8 @@ if (localStorage.getItem('mock_bookmarks') === 'true') {
 }
 
 async function getBookmarks() {
-    let rootItemId = '0';
+    const bookmarksTree = await bookmarks.getTree();
+    let rootItemId = bookmarksTree[0].id;
     let itemsById = {};
 
     function traverse({children}) {
@@ -24,8 +25,7 @@ async function getBookmarks() {
 
     }
 
-    traverse({children: await bookmarks.getTree()});
-
+    traverse({children: bookmarksTree});
 
     {
         const tabIds = itemsById[rootItemId].children;

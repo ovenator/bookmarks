@@ -16,10 +16,11 @@ const store = configureStore({
 
 bookmarks.onChange((data) => {
     const {itemsById, rootItemId} = data;
-    const tabIds = itemsById[rootItemId].children;
-    debug('setting layout', itemsById, rootItemId, tabIds);
+    // const folderIds = itemsById[rootItemId].children;
+    const folderIds = Object.values(itemsById).filter((item) => !!item.children).map(item => item.id);
+    debug('setting layout', itemsById, rootItemId, folderIds);
     layout.calculateLayout({
-        tabs: tabIds.map(tab_id => {
+        tabs: folderIds.map(tab_id => {
             return {
                 id: tab_id,
                 children: itemsById[tab_id].children.filter(item_id => itemsById[item_id].children).map(item_id => ({id: item_id}))
