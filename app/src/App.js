@@ -61,7 +61,9 @@ const App = () => {
                                      key={`item-${item.id}`}
                                      data-item-id={item.id}
                                 >
-                                    <h2 className="font-black" key={item.id}>{item.title} ({item.id})</h2>
+                                    <div class="pb-2 pt-1">
+                                        <h2 className="font-black" key={item.id}>{item.title} ({item.id})</h2>
+                                    </div>
                                     <BookmarkTree {...{item}}/>
                                 </div>
                             ))}

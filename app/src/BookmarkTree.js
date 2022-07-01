@@ -32,7 +32,7 @@ const BookmarkTree = (props) => {
         if (item.children) {
             return (
                 <div data-item-id={item.id} key={`item-${item.id}`}>
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 pb-1 cursor-pointer">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
                         </svg>
@@ -44,7 +44,7 @@ const BookmarkTree = (props) => {
         }
 
         return  (
-            <div data-item-id={item.id} key={`item-${item.id}`} className="flex gap-1">
+            <div data-item-id={item.id} key={`item-${item.id}`} className="flex gap-1 pb-1">
                 <img className="w-5 h-5" src={`http://www.google.com/s2/favicons?domain=${(new URL(item.url)).hostname}`} alt=""/><a href={item.url}>{item.title} ({item.id})</a>
             </div>
         )
