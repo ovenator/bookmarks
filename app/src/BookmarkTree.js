@@ -71,7 +71,7 @@ const BookmarkTree = (props) => {
             list={filteredChildren.map(id => ({...itemsById[id]}))}
             setList={(items) => debug('setList', items)} //ignored, state is changed by onAdd, onUpdate
         >
-            {filteredChildren.map(renderChild)}
+            {filteredChildren.filter(child_id => !itemsById[child_id].isVirtualRoot).map(renderChild)}
         </ReactSortable>
     )
 };

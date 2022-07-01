@@ -27,32 +27,43 @@ async function getBookmarks() {
 
     traverse({children: bookmarksTree});
 
-    {
-        const tabIds = itemsById[rootItemId].children;
-        for (let tabId of tabIds) {
-            const tabItem = itemsById[tabId];
-
-            if (!tabItem.children) {
-                continue;
-            }
-
-            const tabRootItemIds = [];
-            for (let itemId of tabItem.children) {
-                if(!itemsById[itemId].children) {
-                    tabRootItemIds.push(itemId);
-                }
-            }
-            const tabRootId = `${tabId}$$$root`;
-            itemsById[tabRootId] = {
-                id: tabRootId,
-                title: '[ROOT]',
-                children: tabRootItemIds
-            };
-            tabItem.children.push(tabRootId);
+    // folder cannot contain folders and bookmarks at the same time, wrap bookmarks into a virtual folder
+    function createVirtualRootFolders(item) {
+        const {id, children} = item;
+        if (!children) {
+            return;
         }
 
+        children.forEach(child_id => createVirtualRootFolders(itemsById[child_id]));
+
+        const leafChildrenIds = children.filter(child_id => !itemsById[child_id].children);
+
+        const virtualRootId = `${id}$$$root`;
+        itemsById[virtualRootId] = {
+            id: virtualRootId,
+            isVirtualRoot: true,
+            title: '[ROOT]',
+            children: leafChildrenIds
+        };
+        item.children.push(virtualRootId);
     }
 
+    createVirtualRootFolders(itemsById[rootItemId]);
+
+    /**
+     * @typedef BookmarkItem
+     * @property {String} id
+     * @property {String} title
+     * @property {String[]} children
+     * @property {String?} url
+     * @property {Boolean?} isVirtualRoot
+     */
+
+    /**
+     * @typedef NormalizedBookmarks
+     * @property {String} rootItemId
+     * @property {Object<String, BookmarkItem>}
+     */
     return {rootItemId, itemsById};
 }
 
