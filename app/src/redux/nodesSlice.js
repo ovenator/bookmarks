@@ -17,9 +17,8 @@ export const nodesSlice = createSlice({
      */
     initialState: {
         rootItemId: null,
-        currentTabItemId: null,
+        currentTabItemId: localStorage.getItem('currentTabItemId'),
         itemsById: {},
-        columnByItemId: {},
         layout: null
     },
     reducers: {
@@ -52,6 +51,7 @@ export const nodesSlice = createSlice({
         setCurrentTabItem: (state, action) => {
             const {id} = action.payload;
             state.currentTabItemId = id;
+            localStorage.setItem('currentTabItemId', id);
         },
         /**
          * @param state
@@ -72,7 +72,7 @@ export const nodesSlice = createSlice({
             }
 
             //set current tab initially or if the tab folder was removed
-            if (state.currentTabItemId === null || !!itemsById[state.currentTabItemId]) {
+            if (state.currentTabItemId === null || !itemsById[state.currentTabItemId]) {
                 state.currentTabItemId = rootChildren[0];
             }
 
