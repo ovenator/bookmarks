@@ -14,7 +14,7 @@ const BookmarkTree = (props) => {
     let {item, filter, onPick} = props;
 
     const dispatch = useDispatch();
-    filter ??= (({item}) => true);
+    filter ??= ((bookmarkLike) => true);
     onPick ??= (({item}) => true);
 
     const rootItemId = useSelector(state => state.nodes.rootItemId);
@@ -25,7 +25,7 @@ const BookmarkTree = (props) => {
         return null;
     }
 
-    const filteredChildren = item.children.filter(id => filter({item: itemsById[id]}));
+    const filteredChildrenIds = item.children.filter(id => filter(itemsById[id]));
 
     function renderChild(child_id) {
         const item = itemsById[child_id];
@@ -59,17 +59,17 @@ const BookmarkTree = (props) => {
             // this will prevent React from assuming DOM state and failing to remove already missing elements
             // while still acting as unique key when there is no SortableJS related change
             // https://github.com/SortableJS/react-sortablejs/issues/145
-            key={`item-${item.id}-${JSON.stringify(filteredChildren)}`}
+            key={`item-${item.id}-${JSON.stringify(filteredChildrenIds)}`}
             group="item"
             animation={200}
             delayOnTouchStart={true}
             delay={2}
-            onAdd={(customEvent) => bookmarksBackend.move({parent_id: item.id, item_id: customEvent.item.dataset.itemId, index: customEvent.newIndex})} //move
-            onUpdate={(customEvent) => bookmarksBackend.move({parent_id: item.id, item_id: customEvent.item.dataset.itemId, index: customEvent.newIndex})} //move
-            list={filteredChildren.map(id => ({...itemsById[id]}))}
+            onAdd={(customEvent) =>    bookmarksBackend.move({filter, parent_id: item.id, item_id: customEvent.item.dataset.itemId, index: customEvent.newIndex})} //move
+            onUpdate={(customEvent) => bookmarksBackend.move({filter, parent_id: item.id, item_id: customEvent.item.dataset.itemId, index: customEvent.newIndex})} //move
+            list={filteredChildrenIds.map(id => ({...itemsById[id]}))}
             setList={(items) => debug('setList', items)} //ignored, state is changed by onAdd, onUpdate
         >
-            {filteredChildren.filter(child_id => !itemsById[child_id].isVirtualRoot).map(renderChild)}
+            {filteredChildrenIds.filter(child_id => !itemsById[child_id].isVirtualRoot).map(renderChild)}
         </ReactSortable>
     )
 };

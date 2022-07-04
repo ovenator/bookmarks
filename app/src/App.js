@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from "react-redux";
 import * as layoutBackend from './backend/layout';
 import TabSelector from "./TabSelector";
 import BookmarkTree from "./BookmarkTree";
+import {omitFolders} from "./util/filters";
 
 const {openAll} = require('./util/navigation');
 
@@ -65,7 +66,7 @@ const App = () => {
                                     <div className="pb-2 pt-1">
                                         <h2 className="font-black" onMouseDown={e => openAll(e, {item, itemsById})} key={item.id}>{item.title} ({item.id})</h2>
                                     </div>
-                                    <BookmarkTree {...{item}}/>
+                                    <BookmarkTree {...{item, filter: item.isVirtualRoot ? omitFolders : null}}/>
                                 </div>
                             ))}
                         </ReactSortable>

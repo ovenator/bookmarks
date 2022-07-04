@@ -1,4 +1,4 @@
-import {omit, last} from "lodash";
+import {last} from "lodash";
 
 const debug = require('debug')('app:mockBackend');
 const EventEmitter = require('events');
@@ -71,33 +71,23 @@ async function getBookmarks() {
 }
 
 export async function move(params) {
-    const {item_id, parent_id, index} = params;
+    const {item_id, parent_id, index, filter} = params;
     debug('moving', params);
     const [movingBookmark] = await bookmarks.get(item_id);
 
     debug('movingBookmark', movingBookmark);
 
-    let actual_parent_id = parent_id;
-    let omitFolderOrdering = false;
+    let actualParentId = parent_id;
 
     //virtual root folders do have special id not present in bookmarks tree
     //also vrf do not display any folders, hence should take that into account when moving
     if (parent_id.indexOf('$$$root') !== -1) {
-        actual_parent_id = parent_id.split('$$$')[0];
-        omitFolderOrdering = true;
+        actualParentId = parent_id.split('$$$')[0];
     }
 
-    const [parent] = await bookmarks.getSubTree(actual_parent_id);
+    const [parent] = await bookmarks.getSubTree(actualParentId);
 
-    const childIndexMapping = [];
-    for (let child of parent.children) {
-        if(!omitFolderOrdering) {
-            childIndexMapping.push(child);
-        } else if (!child.children) {
-            childIndexMapping.push(child);
-        }
-    }
-
+    const childIndexMapping = parent.children.filter(filter);
 
     let newIndex;
     //when moving to a last place of some other list, the mapping will be missing
@@ -116,44 +106,9 @@ export async function move(params) {
         newIndex ++;
     }
 
-    await bookmarks.move(item_id, {parentId: actual_parent_id, index: newIndex});
+    await bookmarks.move(item_id, {parentId: actualParentId, index: newIndex});
     await load();
 }
-
-
-// export async function move({item_id, parent_id, index}) {
-//     const item = itemsById[item_id];
-//
-//     if (!item) {
-//         throw new Error('Missing item' + item_id);
-//     }
-//
-//
-//     let newData = itemsById;
-//     //remove item from previous parent
-//     for (const [key, value] of Object.entries(itemsById)) {
-//         const removeIndex = value.children?.indexOf(item_id)
-//         if (removeIndex > -1) {
-//             const newChildren = [...value.children.slice(0, removeIndex), ...value.children.slice(removeIndex + 1)]
-//             newData = {...newData, [key]: {...newData[key], children: newChildren}};
-//         }
-//     }
-//
-//     //using new data for cases when the parent stays the same
-//     const parent = newData[parent_id];
-//
-//     if (!parent) {
-//         throw new Error('Missing parent' + item_id);
-//     }
-//
-//     //add item to nex parent
-//     let _index = index ?? parent.children.length;
-//     const newChildren = [...parent.children.slice(0, _index), item_id, ...parent.children.slice(_index)];
-//     newData = {...newData, [parent_id]: {...newData[parent_id], children: newChildren}};
-//
-//     itemsById = newData;
-//     bookmarksObserver.emit('change', {itemsById, rootItemId});
-// }
 
 
 export async function load() {

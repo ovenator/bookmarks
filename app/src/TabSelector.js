@@ -4,7 +4,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {setCurrentTabItem} from "./redux/nodesSlice";
 
 import BookmarkTree from "./BookmarkTree";
-
+import {onlyFolders} from "./util/filters";
 
 const debug = require('debug')('app:components:TabSelector');
 
@@ -16,7 +16,7 @@ const TabSelector = () => {
 
     return (
         <div>
-            <BookmarkTree item={itemsById[rootItemId]} filter={({item}) => !!item.children} onPick={({item}) => dispatch(setCurrentTabItem({id: item.id}))}/>
+            <BookmarkTree item={itemsById[rootItemId]} filter={onlyFolders} onPick={({item}) => dispatch(setCurrentTabItem({id: item.id}))}/>
         </div>
     );
 };
