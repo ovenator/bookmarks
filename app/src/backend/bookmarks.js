@@ -1,3 +1,5 @@
+import {omit, last} from "lodash";
+
 const debug = require('debug')('app:mockBackend');
 const EventEmitter = require('events');
 const bookmarksObserver = new EventEmitter();
@@ -7,6 +9,7 @@ if (localStorage.getItem('mock_bookmarks') === 'true') {
     bookmarks = require('./__bookmarks_mock');
 } else {
     const browser = require('webextension-polyfill');
+    window._browser = browser;
     bookmarks = browser.bookmarks;
 }
 
@@ -70,15 +73,50 @@ async function getBookmarks() {
 export async function move(params) {
     const {item_id, parent_id, index} = params;
     debug('moving', params);
-    const [currentBookmark] = await bookmarks.get(item_id);
-    let newIndex = index;
-    debug('currentBookmark', currentBookmark);
+    const [movingBookmark] = await bookmarks.get(item_id);
+
+    debug('movingBookmark', movingBookmark);
+
+    let actual_parent_id = parent_id;
+    let omitFolderOrdering = false;
+
+    //virtual root folders do have special id not present in bookmarks tree
+    //also vrf do not display any folders, hence should take that into account when moving
+    if (parent_id.indexOf('$$$root') !== -1) {
+        actual_parent_id = parent_id.split('$$$')[0];
+        omitFolderOrdering = true;
+    }
+
+    const [parent] = await bookmarks.getSubTree(actual_parent_id);
+
+    const childIndexMapping = [];
+    for (let child of parent.children) {
+        if(!omitFolderOrdering) {
+            childIndexMapping.push(child);
+        } else if (!child.children) {
+            childIndexMapping.push(child);
+        }
+    }
+
+
+    let newIndex;
+    //when moving to a last place of some other list, the mapping will be missing
+    if (childIndexMapping.length > 0) {
+        if (childIndexMapping.length > index) {
+            newIndex = childIndexMapping[index].index
+        } else {
+            newIndex = last(childIndexMapping).index + 1;
+        }
+    } else {
+        newIndex = 0;
+    }
+
     // the bookmark is still in the original place, we do not want to count it in when changing the index
-    if (currentBookmark.parentId === parent_id && index > currentBookmark.index) {
+    if (movingBookmark.parentId === parent.id && newIndex > movingBookmark.index) {
         newIndex ++;
     }
 
-    await bookmarks.move(item_id, {parentId: parent_id, index: newIndex});
+    await bookmarks.move(item_id, {parentId: actual_parent_id, index: newIndex});
     await load();
 }
 
