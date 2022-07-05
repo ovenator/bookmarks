@@ -2,7 +2,7 @@ import './App.css';
 
 import { ReactSortable } from "react-sortablejs";
 import {useDispatch, useSelector} from "react-redux";
-
+import {toggleFolderExpand} from "./redux/nodesSlice";
 
 import * as bookmarksBackend from "./backend/bookmarks";
 
@@ -11,7 +11,7 @@ const {openAll} = require('./util/navigation');
 const debug = require('debug')('app:components:BookmarkTree');
 
 const BookmarkTree = (props) => {
-    let {item, filter, onPick} = props;
+    let {item, filter, onPick, viewId} = props;
 
     const dispatch = useDispatch();
     filter ??= ((bookmarkLike) => true);
@@ -20,6 +20,7 @@ const BookmarkTree = (props) => {
     const rootItemId = useSelector(state => state.nodes.rootItemId);
     const currentTabItemId = useSelector(state => state.nodes.currentTabItemId);
     const itemsById = useSelector(state => state.nodes.itemsById);
+    const folderExpand = useSelector(state => state.nodes.folderExpand);
 
     if(!item.children) {
         return null;
@@ -29,17 +30,33 @@ const BookmarkTree = (props) => {
 
     function renderChild(child_id) {
         const item = itemsById[child_id];
+        const isExpanded = !!folderExpand?.[viewId]?.[child_id];
+
+        let localFilter = filter;
+        if(!isExpanded) {
+            localFilter = () => false;
+        }
+
+        const openFolderIcon = <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
+        </svg>
+
+        const closedFolderIcon = <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+        </svg>
 
         if (item.children) {
+            const filteredChildren = item.children.map(id => itemsById[id]).filter(i => !i.isVirtualRoot).filter(filter);
+
             return (
                 <div data-item-id={item.id} key={`item-${item.id}`}>
                     <div className="flex gap-1 pb-1 cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
-                        </svg>
-                        <div onClick={() => onPick({item})} onMouseDown={e => openAll(e, {item, itemsById})} className={currentTabItemId === child_id ? 'font-bold' : ''} key={child_id}>{itemsById[child_id].title} ({child_id})</div>
+                        <div onClick={() => dispatch(toggleFolderExpand({view_id: viewId, folder_id: child_id}))}>
+                            {isExpanded ? openFolderIcon : closedFolderIcon}
+                        </div>
+                        <div onClick={() => onPick({item})} onMouseDown={e => openAll(e, {item, itemsById})} className={currentTabItemId === child_id ? 'font-bold' : ''} key={child_id}>{itemsById[child_id].title} ({filteredChildren.length}) (id:{child_id})</div>
                     </div>
-                    <BookmarkTree {...props} item={itemsById[child_id]}/>
+                    <BookmarkTree {...props} filter={localFilter} item={itemsById[child_id]}/>
                 </div>
             )
         }

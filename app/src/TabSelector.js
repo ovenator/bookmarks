@@ -16,7 +16,7 @@ const TabSelector = () => {
 
     return (
         <div>
-            <BookmarkTree item={itemsById[rootItemId]} filter={onlyFolders} onPick={({item}) => dispatch(setCurrentTabItem({id: item.id}))}/>
+            <BookmarkTree viewId={rootItemId} item={itemsById[rootItemId]} filter={onlyFolders} onPick={({item}) => dispatch(setCurrentTabItem({id: item.id}))}/>
         </div>
     );
 };

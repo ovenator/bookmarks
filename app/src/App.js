@@ -66,7 +66,7 @@ const App = () => {
                                     <div className="pb-2 pt-1">
                                         <h2 className="font-black" onMouseDown={e => openAll(e, {item, itemsById})} key={item.id}>{item.title} ({item.id})</h2>
                                     </div>
-                                    <BookmarkTree {...{item, filter: item.isVirtualRoot ? omitFolders : null}}/>
+                                    <BookmarkTree {...{item, filter: item.isVirtualRoot ? omitFolders : null, viewId: currentTabItemId}}/>
                                 </div>
                             ))}
                         </ReactSortable>

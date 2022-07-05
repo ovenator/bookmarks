@@ -80,13 +80,13 @@ export async function move(params) {
     let actualParentId = parent_id;
 
     //virtual root folders do have special id not present in bookmarks tree
-    //also vrf do not display any folders, hence should take that into account when moving
     if (parent_id.indexOf('$$$root') !== -1) {
         actualParentId = parent_id.split('$$$')[0];
     }
 
     const [parent] = await bookmarks.getSubTree(actualParentId);
 
+    //when moving within filtered space, the new index needs to be relative to another filtered item
     const childIndexMapping = parent.children.filter(filter);
 
     let newIndex;

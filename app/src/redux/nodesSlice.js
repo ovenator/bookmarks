@@ -18,6 +18,7 @@ export const nodesSlice = createSlice({
     initialState: {
         rootItemId: null,
         currentTabItemId: localStorage.getItem('currentTabItemId'),
+        folderExpand: JSON.parse(localStorage.getItem('folderExpand')),
         itemsById: {},
         layout: null
     },
@@ -93,10 +94,17 @@ export const nodesSlice = createSlice({
             state.tree = action.payload;
             state.currentTabItemId = action.payload.currentTabId ?? state.currentTabItemId;
 
+        },
+        toggleFolderExpand(state, action) {
+            state.folderExpand ??= {};
+            const {view_id, folder_id} = action.payload;
+            state.folderExpand[view_id] ??= {};
+            state.folderExpand[view_id][folder_id] = !state.folderExpand[view_id][folder_id];
+            localStorage.setItem('folderExpand', JSON.stringify(state.folderExpand));
         }
     },
 })
 
-export const { setChildren, setColumnChildren, setCurrentTabItem, setData, setLayout, setTree } = nodesSlice.actions
+export const { setChildren, setColumnChildren, setCurrentTabItem, setData, setLayout, setTree, toggleFolderExpand } = nodesSlice.actions
 
 export default nodesSlice.reducer
