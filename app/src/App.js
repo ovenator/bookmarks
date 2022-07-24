@@ -44,6 +44,7 @@ const App = () => {
             </div>
 
             <div className="flex border container">
+                {/* columns */}
                 {layout[currentTabItemId].map((col_item_ids, col_ix) => (
 
                     <div className="flex-grow flex flex-col w-1/3" key={`col-${col_ix}-${JSON.stringify(col_item_ids)}`}>

@@ -11,7 +11,7 @@ const {openAll} = require('./util/navigation');
 const debug = require('debug')('app:components:BookmarkTree');
 
 const BookmarkTree = (props) => {
-    let {item, filter, onPick, viewId} = props;
+    let {item, filter, onPick, viewId, placeholder} = props;
 
     const dispatch = useDispatch();
     filter ??= ((bookmarkLike) => true);
@@ -47,14 +47,15 @@ const BookmarkTree = (props) => {
 
         if (item.children) {
             const filteredChildren = item.children.map(id => itemsById[id]).filter(i => !i.isVirtualRoot).filter(filter);
+            const dispatchExpand = () => dispatch(toggleFolderExpand({view_id: viewId, folder_id: child_id}));
 
             return (
                 <div data-item-id={item.id} key={`item-${item.id}`}>
                     <div className="flex gap-1 pb-1 cursor-pointer">
-                        <div onClick={() => dispatch(toggleFolderExpand({view_id: viewId, folder_id: child_id}))}>
+                        <div onClick={dispatchExpand}>
                             {isExpanded ? openFolderIcon : closedFolderIcon}
                         </div>
-                        <div onClick={() => onPick({item})} onMouseDown={e => openAll(e, {item, itemsById})} className={currentTabItemId === child_id ? 'font-bold' : ''} key={child_id}>{itemsById[child_id].title} ({filteredChildren.length}) (id:{child_id})</div>
+                        <div onDoubleClick={dispatchExpand} onClick={() => onPick({item})} onMouseDown={e => openAll(e, {item, itemsById})} className={currentTabItemId === child_id ? 'font-bold' : ''} key={child_id}>{itemsById[child_id].title} ({filteredChildren.length}) (id:{child_id})</div>
                     </div>
                     <BookmarkTree {...props} filter={localFilter} item={itemsById[child_id]}/>
                 </div>
